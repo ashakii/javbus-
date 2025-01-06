@@ -1,6 +1,13 @@
 class Magnet {
-  static zhReg = /中文|中字|字幕|\[[a-z]?hdc[a-z]?\]|[-_\s]+(uc|c|ch|cu|zh)(?![a-z])/i;
-  static crackReg = /无码|無碼|流出|破解|解密版|uncensored|破[一-鿆]版|[-_\s]+(cu|u|uc)(?![a-z])/i;
+  static crackReg = /破解|-uc?(?![a-z])|uncensored|無碼|无码|流出/i;
+  static zhReg = /(?!6k(-C)?)(中文|中字|字幕|-u?c(?![a-z])|.+(?<![a-z])ch(?![a-z])|\dc(?![a-z]))/i;
+  static fourkReg = /4k/i;
+  //static zhReg = /^(?!.*(?:6k(?:-C)?|-C_GG5|C字幕|C_X1080X|CD|-cd\d)).*(-c)/i;
+  static ucReg = /-uc|破解-c|(UC.torrent)|C.torrent.无码|C.torrent.无码破解/i;
+  static chReg = /(?!6k(-C)?|破解-C)(-c)/i;
+  static crReg = /(?!6k(-C)?|破解-C)(破解)/i;
+  static wumaReg = /无码|無碼|流出/i;
+  static vrReg = /VR|時間/i;
 
   static useTransByte() {
     const rules = [
@@ -31,8 +38,19 @@ class Magnet {
   }
 
   static magnetSort = (a, b) => {
+    const toRegex = /\.torrent($|\.)/;
+    const aIsTo = toRegex.test(a.name);
+    const bIsTo = toRegex.test(b.name);
+
+    const cRegex = /(?:[-_])C(?:$|\s|_)/; // 匹配 -C, -C_GG5, -C字幕 等形式
+    const aIsC = cRegex.test(a.name);
+    const bIsC = cRegex.test(b.name);
+
+    if (aIsTo !== bIsTo) return aIsTo ? -1 : 1;
+    if (aIsC !== bIsC) return aIsC ? -1 : 1;
     if (a.zh !== b.zh) return a.zh ? -1 : 1;
     if (a.crack !== b.crack) return a.crack ? -1 : 1;
+    if (a.fourk !== b.fourk) return a.fourk ? -1 : 1;
     return parseFloat(b.size) - parseFloat(a.size);
   };
 }
